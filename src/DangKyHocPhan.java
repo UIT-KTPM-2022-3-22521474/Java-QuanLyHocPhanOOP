@@ -13,6 +13,10 @@ class Student {
         System.out.println("Full name: " + fullName + ".");
         System.out.println("Student ID: " + studentID + ".");
     }
+
+    public String getStudentID() {
+        return studentID;
+    }
 }
 
 class Class {
@@ -53,84 +57,114 @@ public class DangKyHocPhan {
         System.out.println("Course registration - To Vinh Tien - 22521474.");
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter student information:");
-        String fullName = "";
-        while (fullName.trim().isEmpty()) {
-            System.out.print("Full name: ");
-            fullName = scanner.nextLine().trim();
-            if (fullName.trim().isEmpty()) {
-                System.out.println("Full name cannot be empty. Please enter again.");
-            }
-        }
-        String studentID = "";
-        while (studentID.trim().isEmpty()) {
-            System.out.print("Student ID: ");
-            studentID = scanner.nextLine().trim();
-            if (studentID.trim().isEmpty()) {
-                System.out.println("Student ID cannot be empty. Please enter again.");
-            }
+        System.out.print("Enter the number of students: ");
+        int numberOfStudents = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Enter the number of classes: ");
+        int numberOfClasses = scanner.nextInt();
+        scanner.nextLine();
+
+        Student[] students = new Student[numberOfStudents];
+        for (int i = 0; i < numberOfStudents; i++) {
+            boolean isIDUnique;
+            String fullName = "";
+            String studentID = "";
+            do {
+                isIDUnique = true;
+                System.out.println("Enter " + getOrdinal(i + 1) + " student information:");
+                while (fullName.trim().isEmpty()) {
+                    System.out.print("Full name: ");
+                    fullName = scanner.nextLine().trim();
+                    if (fullName.trim().isEmpty()) {
+                        System.out.println("Full name cannot be empty. Please enter again.");
+                    }
+                }
+                while (studentID.trim().isEmpty()) {
+                    System.out.print("Student ID: ");
+                    studentID = scanner.nextLine().trim();
+                    if (studentID.trim().isEmpty()) {
+                        System.out.println("Student ID cannot be empty. Please enter again.");
+                    }
+                    isIDUnique = isStudentIDUnique(students, studentID);
+                    if (!isIDUnique) {
+                        System.out.println("Student ID already exists. Please enter a unique ID.");
+                        fullName = "";
+                        studentID="";
+                        break;
+                    }
+                }
+            } while (!isIDUnique);
+            students[i] = new Student(fullName, studentID);
         }
 
-        Student student = new Student(fullName, studentID);
+        Class[] classes = new Class[numberOfClasses];
+        for (int i = 0; i < numberOfClasses; i++) {
+            System.out.println("\nEnter " + getOrdinal(i + 1) +" class information:");
+            String classCode = "";
+            while (classCode.trim().isEmpty()) {
+                System.out.print("Class code: ");
+                classCode = scanner.nextLine().trim();
+                if (classCode.trim().isEmpty()) {
+                    System.out.println("Class code cannot be empty. Please enter again.");
+                }
+            }
+            String className = "";
+            while (className.trim().isEmpty()) {
+                System.out.print("Class name: ");
+                className = scanner.nextLine().trim();
+                if (className.trim().isEmpty()) {
+                    System.out.println("Class name cannot be empty. Please enter again.");
+                }
+            }
 
-        System.out.println("\nEnter class information:");
-        String classCode = "";
-        while (classCode.trim().isEmpty()) {
-            System.out.print("Class code: ");
-            classCode = scanner.nextLine().trim();
-            if (classCode.trim().isEmpty()) {
-                System.out.println("Class code cannot be empty. Please enter again.");
-            }
-        }
-        String className = "";
-        while (className.trim().isEmpty()) {
-            System.out.print("Class name: ");
-            className = scanner.nextLine().trim();
-            if (className.trim().isEmpty()) {
-                System.out.println("Class name cannot be empty. Please enter again.");
-            }
-        }
+            int credit = -1;
+            while (credit < 0) {
+                System.out.print("Credit: ");
+                credit = scanner.nextInt();
+                scanner.nextLine();
 
-        int credit = -1;
-        while (credit < 0) {
-            System.out.print("Credit: ");
-            credit = scanner.nextInt();
-            scanner.nextLine();
-
-            if (credit < 0) {
-                System.out.println("Credit cannot be negative. Please enter again.");
+                if (credit < 0) {
+                    System.out.println("Credit cannot be negative. Please enter again.");
+                }
             }
-        }
-        System.out.println("Enter start time:");
-        String startTime = getTime();
-        System.out.println("Enter end time:");
-        String endTime;
-        do {
-            endTime = getTime();
-            if (isEndTimeValid(startTime, endTime)) {
-                System.out.println("End time must be after start time. Please enter again.");
-                System.out.println("Enter end time:");
-            }
-        } while (isEndTimeValid(startTime, endTime));
-        String dayOfWeek = getDayOfWeek();
-        System.out.println("Enter start date: ");
-        String startDate = getDate();
-        String endDate = "";
-        while (endDate.trim().isEmpty()) {
-            System.out.println("Enter end date: ");
-            endDate = getDate();
-            if (!isDateValid(startDate, endDate)) {
+            System.out.println("Enter start time:");
+            String startTime = getTime();
+            System.out.println("Enter end time:");
+            String endTime;
+            do {
+                endTime = getTime();
+                if (isEndTimeValid(startTime, endTime)) {
+                    System.out.println("End time must be after start time. Please enter again.");
+                    System.out.println("Enter end time:");
+                }
+            } while (isEndTimeValid(startTime, endTime));
+            String dayOfWeek = getDayOfWeek();
+            System.out.println("Enter start date: ");
+            String startDate = getDate();
+            String endDate = "";
+            while (endDate.trim().isEmpty()) {
+                System.out.println("Enter end date: ");
+                endDate = getDate();
+                if (!isDateValid(startDate, endDate)) {
                     System.out.println("End date must be later than start date. Please enter again.");
                     endDate = "";
+                }
             }
+            classes[i] = new Class(classCode, className, credit, startTime, endTime, dayOfWeek, startDate, endDate);
         }
-        Class classInfo = new Class(classCode, className, credit, startTime, endTime, dayOfWeek, startDate, endDate);
 
-        System.out.println("\nStudent Information:");
-        student.displayInfo();
-        System.out.println("\nClass Information:");
-        classInfo.displayInfo();
+        System.out.println("\nStudents Information:");
+        for (Student student : students) {
+            student.displayInfo();
+            System.out.println();
+        }
 
+        System.out.println("\nClasses Information:");
+        for (Class classInfo : classes) {
+            classInfo.displayInfo();
+            System.out.println();
+        }
         scanner.close();
     }
 
@@ -267,6 +301,15 @@ public class DangKyHocPhan {
         return date;
     }
 
+    private static boolean isStudentIDUnique(Student[] students, String studentID) {
+        for (Student student : students) {
+            if (student != null && student.getStudentID().equals(studentID)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private static boolean isValidDate(int day, int month, int year) {
         if (month == 2) {
             if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
@@ -311,5 +354,19 @@ public class DangKyHocPhan {
         int second = Integer.parseInt(parts[2]);
 
         return (hour * 3600L + minute * 60L + second) * 1000;
+    }
+
+    private static String getOrdinal(int number) {
+        int remainder10 = number % 10;
+        int remainder100 = number % 100;
+        if (remainder10 == 1 && remainder100 != 11) {
+            return number + "st";
+        } else if (remainder10 == 2 && remainder100 != 12) {
+            return number + "nd";
+        } else if (remainder10 == 3 && remainder100 != 13) {
+            return number + "rd";
+        } else {
+            return number + "th";
+        }
     }
 }
